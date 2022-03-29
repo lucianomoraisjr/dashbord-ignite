@@ -12,9 +12,11 @@ import {
     Tbody, 
     Td, 
     Text, 
-    useBreakpointValue
+    useBreakpointValue,
+    Spinner
   } from "@chakra-ui/react";
 import Link from "next/link";
+import{useQuery} from 'react-query'
 import { useEffect } from "react";
   
   import { RiAddLine, RiPencilLine } from "react-icons/ri";
@@ -24,16 +26,18 @@ import { Pagination } from "../../components/Pagination";
   import { SideBar } from "../../components/SideBar";
   
   export default function UserList() {
+    const {data, isLoading,error} = useQuery('users',async ()=>{
+      const response = await fetch('http://localhost:3000/api/users')
+      const data = await response.json()
+      return data
+    })
+    
     const isWideVersion =  useBreakpointValue({
       base:false,
       lg:true
     })
 
-    useEffect(()=>{
-      fetch('http://localhost:3000/api/users')
-      .then(response =>response.json())
-      .then(data=>console.log(data))
-    },[])
+    
     
     return (
       <Box>
@@ -52,7 +56,12 @@ import { Pagination } from "../../components/Pagination";
               </Link>
             </Flex>
   
-            <Table colorScheme="whiteAlpha">
+            {isLoading?<Flex justify='center'>
+                    <Spinner />
+            </Flex>
+           :error?<><Flex justify='center'><Heading color='red'>Erro</Heading></Flex></> 
+          :<>
+                      <Table colorScheme="whiteAlpha">
               <Thead>
                 <Tr>
                   <Th px={["4","4", "6"]} color="gray.300" width="8">
@@ -119,6 +128,7 @@ import { Pagination } from "../../components/Pagination";
             </Table>
 
             <Pagination/>
+          </>}
           </Box>
         </Flex>
       </Box>
