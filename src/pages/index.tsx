@@ -1,8 +1,14 @@
 import {Button, Flex,Stack } from '@chakra-ui/react'
+import { useEffect } from 'react'
 import { Input } from '../components/Form/Input'
 
 
 export default function SignIn() {
+  useEffect(()=>{
+    fetch('http://localhost:3000/api/users')
+    .then(response =>response.json())
+    .then(data=>console.log(data))
+  },[])
   return (
     <Flex 
     w="100vw" 
