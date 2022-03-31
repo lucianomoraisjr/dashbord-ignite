@@ -1,11 +1,32 @@
 import { Box, Button, Divider, Flex, Heading, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useMutation } from "react-query";
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
 import { SideBar } from "../../components/SideBar";
+import { api } from "../../services/api";
+import { queryClient } from "../../services/queryClient";
 
 
 export default function CreateUser(){
+    const router = useRouter()
+
+    const createUser = useMutation(async(user:any)=>{
+       
+        const response = await api.post('users',{
+            user:{
+                ///...user,
+                name:'luciano2',
+                email:'luciano2@teste.com',
+                created_at:new Date(),
+            }
+        })
+        return response.data.user;
+    },{
+        onSuccess:()=>{queryClient.invalidateQueries(['users'])}
+    })
+
     return(
         <Box>
             <Header/>
@@ -29,7 +50,10 @@ export default function CreateUser(){
                            <Link href='/users' passHref>
                            <Button  as='a' colorScheme="whiteAlpha">Cancelar</Button>
                            </Link>
-                            <Button colorScheme="pink">Salvar</Button>
+                            <Button onClick={async ()=>{
+                                await createUser.mutateAsync('user')
+                                router.push('users')
+                            }} colorScheme="pink">Salvar</Button>
                         </HStack>
                     </Flex>
                 </Box>
