@@ -26,12 +26,37 @@ import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { SideBar } from "../../components/SideBar";
 import { api } from "../../services/api";
-import { useUsers } from "../../services/hooks/useUsers";
+import { getUsers, useUsers } from "../../services/hooks/useUsers";
 import { queryClient } from "../../services/queryClient";
+import { GetServerSideProps } from "next";
 
-export default function UserList() {
+type User = {
+  id:string
+  name:string
+  email:string
+  created_at:string
+}
+
+type getUsersResponse= {
+ 
+  users:User[]
+
+}
+
+interface IUseUsers {
+
+  isLoading:boolean
+  isFetching:boolean
+  error:any
+  
+}
+
+
+export default function UserList({users}:getUsersResponse) {
   const [page,setPage]=useState(1)
-  const { data, isLoading, isFetching, error } = useUsers(page)
+  const { data, isLoading, isFetching, error } = useUsers(page,{
+    initialData:users
+  })
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -118,4 +143,15 @@ export default function UserList() {
       </Flex>
     </Box>
   )
+}
+
+
+export const getServerSideProrps:GetServerSideProps = async () =>{
+  const {users}:getUsersResponse = await getUsers(1)
+
+  return{
+    props:{
+      users, 
+    }
+  }
 }
